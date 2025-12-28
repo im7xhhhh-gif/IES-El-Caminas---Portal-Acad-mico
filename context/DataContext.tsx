@@ -20,7 +20,8 @@ interface DataContextType {
   replyMessage: (messageId: string, response: string) => void;
   markAsRead: (messageId: string) => void;
   deleteMessage: (messageId: string) => void;
-  saveData: () => Promise<void>; // New manual save function
+  saveData: () => Promise<void>; 
+  resetToDefaults: () => void; // New function to reset DB
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -58,28 +59,18 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // LISTEN FOR EXTERNAL CHANGES (Cross-Tab Synchronization)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'ies_users' && e.newValue) {
-         setUsers(JSON.parse(e.newValue));
-      }
-      if (e.key === 'ies_grades' && e.newValue) {
-         setGrades(JSON.parse(e.newValue));
-      }
-      if (e.key === 'ies_attendance' && e.newValue) {
-         setAttendance(JSON.parse(e.newValue));
-      }
-      if (e.key === 'ies_messages' && e.newValue) {
-         setMessages(JSON.parse(e.newValue));
-      }
+      if (e.key === 'ies_users' && e.newValue) setUsers(JSON.parse(e.newValue));
+      if (e.key === 'ies_grades' && e.newValue) setGrades(JSON.parse(e.newValue));
+      if (e.key === 'ies_attendance' && e.newValue) setAttendance(JSON.parse(e.newValue));
+      if (e.key === 'ies_messages' && e.newValue) setMessages(JSON.parse(e.newValue));
     };
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Manual save function to be triggered by the Admin Button
+  // Manual save function 
   const saveData = async () => {
-    // We force a rewrite to LocalStorage to simulate a "Commit" action
-    // In a real backend, this would be an API POST/PUT call
     return new Promise<void>((resolve) => {
         setTimeout(() => {
             localStorage.setItem('ies_users', JSON.stringify(users));
@@ -87,8 +78,19 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             localStorage.setItem('ies_attendance', JSON.stringify(attendance));
             localStorage.setItem('ies_messages', JSON.stringify(messages));
             resolve();
-        }, 600); // Small artificial delay for UX "saving" feeling
+        }, 600); 
     });
+  };
+
+  // Hard Reset Function
+  const resetToDefaults = () => {
+      if (window.confirm("¿Estás seguro? Se borrarán TODOS los datos guardados en este navegador y se restaurarán los valores iniciales del sistema. Esta acción no se puede deshacer.")) {
+          localStorage.removeItem('ies_users');
+          localStorage.removeItem('ies_grades');
+          localStorage.removeItem('ies_attendance');
+          localStorage.removeItem('ies_messages');
+          window.location.reload();
+      }
   };
 
   const addUser = (user: User) => {
@@ -99,26 +101,16 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUsers(users.map(u => u.id === updatedUser.id ? updatedUser : u));
   };
 
-  // New function to handle ID changes securely across all data tables
   const updateStudentId = (oldId: string, newId: string) => {
     if (oldId === newId) return;
-    
-    // 1. Update User List
     setUsers(prev => prev.map(u => u.id === oldId ? { ...u, id: newId } : u));
-    
-    // 2. Update Grades
     setGrades(prev => prev.map(g => g.studentId === oldId ? { ...g, studentId: newId } : g));
-    
-    // 3. Update Attendance
     setAttendance(prev => prev.map(a => a.studentId === oldId ? { ...a, studentId: newId } : a));
-    
-    // 4. Update Messages
     setMessages(prev => prev.map(m => m.studentId === oldId ? { ...m, studentId: newId } : m));
   };
 
   const deleteUser = (id: string) => {
     setUsers(users.filter(u => u.id !== id));
-    // Also cleanup grades/attendance for this user
     setGrades(grades.filter(g => g.studentId !== id));
     setAttendance(attendance.filter(a => a.studentId !== id));
     setMessages(messages.filter(m => m.studentId !== id));
@@ -135,11 +127,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             return g;
         });
       }
-      
-      // If we are trying to clear a grade that doesn't exist, do nothing
       if (score === undefined) return prev;
 
-      // Create new grade entry
       const newGrade: Grade = { studentId, subjectId };
       if (semester === 1) newGrade.semester1 = score;
       else newGrade.semester2 = score;
@@ -165,7 +154,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
   };
 
-  // Messaging Logic
   const sendMessage = (msgData: Omit<Message, 'id' | 'status' | 'sentAt'>) => {
     const newMessage: Message = {
       ...msgData,
@@ -208,7 +196,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       users, subjects, grades, attendance, messages,
       addUser, updateUser, updateStudentId, deleteUser, 
       updateGrade, updateAttendance, getStudentData,
-      sendMessage, replyMessage, markAsRead, deleteMessage, saveData
+      sendMessage, replyMessage, markAsRead, deleteMessage, 
+      saveData, resetToDefaults
     }}>
       {children}
     </DataContext.Provider>

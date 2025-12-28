@@ -1,10 +1,13 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Shield, ArrowRight, AlertCircle } from 'lucide-react';
+import { useData } from '../context/DataContext';
+import { Shield, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
 import { InputField } from '../components/InputField';
 
 export const Login: React.FC = () => {
   const { login } = useAuth();
+  const { resetToDefaults } = useData();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -85,6 +88,19 @@ export const Login: React.FC = () => {
                 </button>
             </div>
           </form>
+
+          {/* Reset Data Section */}
+          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+             <p className="text-xs text-gray-400 mb-3">¿Problemas con los datos o credenciales?</p>
+             <button 
+               onClick={resetToDefaults}
+               className="text-xs font-bold text-gray-500 hover:text-red-700 flex items-center justify-center gap-2 mx-auto transition-colors"
+               title="Esto borrará los datos locales y restaurará los usuarios originales"
+             >
+                <RefreshCw size={12} />
+                Restaurar Datos de Fábrica
+             </button>
+          </div>
         </div>
       </div>
       
