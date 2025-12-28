@@ -75,13 +75,13 @@ export const INITIAL_GRADES: Grade[] = [
 ];
 
 // Initial Attendance
-// Imad: 3 hours total.
-// Walid: 13 hours total.
+// Imad: 3 hours total (0 justified).
+// Walid: 13 hours total (13 justified).
 export const INITIAL_ATTENDANCE: Attendance[] = [
-  { studentId: '2984619', subjectId: 'sub1', absences: 3 }, // Imad Total: 3
+  { studentId: '2984619', subjectId: 'sub1', absences: 3, justified: 0 }, // Imad
   
-  { studentId: '1209362', subjectId: 'sub2', absences: 8 }, // Walid Part 1
-  { studentId: '1209362', subjectId: 'sub5', absences: 5 }, // Walid Part 2 (Total 13)
+  { studentId: '1209362', subjectId: 'sub2', absences: 8, justified: 8 }, // Walid Part 1 (Justified)
+  { studentId: '1209362', subjectId: 'sub5', absences: 5, justified: 5 }, // Walid Part 2 (Justified)
 ];
 
 export const INITIAL_MESSAGES: Message[] = [

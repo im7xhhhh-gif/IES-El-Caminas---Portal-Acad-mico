@@ -14,7 +14,7 @@ interface DataContextType {
   updateStudentId: (oldId: string, newId: string) => void;
   deleteUser: (id: string) => void;
   updateGrade: (studentId: string, subjectId: string, semester: 1 | 2, score: number | undefined) => void;
-  updateAttendance: (studentId: string, subjectId: string, absences: number) => void;
+  updateAttendance: (studentId: string, subjectId: string, absences: number, justified?: number) => void;
   getStudentData: (studentId: string) => { grades: Grade[], attendance: Attendance[] };
   sendMessage: (msg: Omit<Message, 'id' | 'status' | 'sentAt'>) => void;
   replyMessage: (messageId: string, response: string) => void;
@@ -137,13 +137,13 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
   };
 
-  const updateAttendance = (studentId: string, subjectId: string, absences: number) => {
+  const updateAttendance = (studentId: string, subjectId: string, absences: number, justified?: number) => {
     setAttendance(prev => {
       const existing = prev.find(a => a.studentId === studentId && a.subjectId === subjectId);
       if (existing) {
-        return prev.map(a => (a.studentId === studentId && a.subjectId === subjectId) ? { ...a, absences } : a);
+        return prev.map(a => (a.studentId === studentId && a.subjectId === subjectId) ? { ...a, absences, ...(justified !== undefined ? { justified } : {}) } : a);
       }
-      return [...prev, { studentId, subjectId, absences }];
+      return [...prev, { studentId, subjectId, absences, justified: justified || 0 }];
     });
   };
 

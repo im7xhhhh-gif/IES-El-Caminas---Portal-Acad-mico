@@ -125,8 +125,6 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ view }) => {
   // Evolution Data for Chart
   const chartData = subjects.map(sub => {
     const { s1, s2 } = getSubjectGrades(sub.id);
-    // For charts, we use 0 if undefined to show gaps, or we could filter. 
-    // Using 0 is standard for visual gap in area chart if connected, but let's just use what we have.
     return {
       name: sub.name.substring(0, 4) + '.',
       fullName: sub.name,
@@ -134,6 +132,10 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ view }) => {
       Semestre2: s2 || 0,
     };
   });
+
+  // Calculate Absences
+  const totalAbsences = attendance.reduce((acc, curr) => acc + curr.absences, 0);
+  const totalJustified = attendance.reduce((acc, curr) => acc + (curr.justified || 0), 0);
 
   return (
     <div className="space-y-8">
@@ -164,9 +166,16 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ view }) => {
 
         <div className="p-4 text-center">
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Faltas de Asistencia (Horas)</p>
-            <p className={`text-3xl font-bold ${attendance.reduce((acc, curr) => acc + curr.absences, 0) > 10 ? 'text-red-700' : 'text-gray-800'}`}>
-                {attendance.reduce((acc, curr) => acc + curr.absences, 0)}
-            </p>
+            <div className="flex flex-col items-center">
+                <p className={`text-3xl font-bold ${totalAbsences > 10 ? 'text-red-700' : 'text-gray-800'}`}>
+                    {totalAbsences}
+                </p>
+                {totalJustified > 0 && (
+                     <p className="text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full mt-1">
+                        {totalJustified} Justificadas
+                     </p>
+                )}
+            </div>
         </div>
       </div>
 

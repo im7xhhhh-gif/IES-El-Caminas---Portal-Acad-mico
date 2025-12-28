@@ -52,6 +52,7 @@ export interface Attendance {
   studentId: string;
   subjectId: string;
   absences: number; // Number of hours missed
+  justified?: number; // Subset of absences that are justified
 }
 
 export interface StudentWithData extends User {
