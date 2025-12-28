@@ -4,6 +4,7 @@ import { useData } from '../../context/DataContext';
 import { User, UserRole } from '../../types';
 import { Plus, Trash2, Edit2, Search, X, Eye, Fingerprint } from 'lucide-react';
 import { InputField } from '../../components/InputField';
+import { AdminSaveButton } from '../../components/AdminSaveButton';
 
 export const StudentManager: React.FC = () => {
   const { users, addUser, updateUser, updateStudentId, deleteUser } = useData();
@@ -101,7 +102,7 @@ export const StudentManager: React.FC = () => {
         group: formData.group
       });
     }
-    setIsEditModalOpen(false);
+    // Modal closes automatically via the onSave callback in AdminSaveButton
   };
 
   return (
@@ -269,12 +270,12 @@ export const StudentManager: React.FC = () => {
                 >
                   Cancelar
                 </button>
-                <button 
-                  type="submit"
-                  className="px-4 py-2 bg-red-900 text-white rounded-sm hover:bg-red-800 transition-colors text-sm font-bold uppercase shadow-sm"
-                >
-                  Guardar
-                </button>
+                {/* Replaced standard submit button with AdminSaveButton that handles visual success */}
+                <AdminSaveButton 
+                    label="Guardar Datos" 
+                    className="bg-red-900 hover:bg-red-800"
+                    onSave={() => setTimeout(() => setIsEditModalOpen(false), 500)}
+                />
               </div>
             </form>
           </div>

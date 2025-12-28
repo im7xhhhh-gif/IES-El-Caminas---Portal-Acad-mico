@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 import { UserRole, Message } from '../../types';
 import { Mail, Reply, Trash2, Search, CheckCircle2, Clock } from 'lucide-react';
+import { AdminSaveButton } from '../../components/AdminSaveButton';
 
 export const MessageCenter: React.FC = () => {
   const { currentUser } = useAuth();
@@ -41,8 +43,8 @@ export const MessageCenter: React.FC = () => {
   const handleReply = (e: React.FormEvent, msgId: string) => {
     e.preventDefault();
     replyMessage(msgId, replyText);
-    setExpandedId(null);
-    setReplyText('');
+    // Note: The button inside manages the save call, but here we clear state
+    // We rely on the onSave callback to clear UI
   };
 
   return (
@@ -116,12 +118,21 @@ export const MessageCenter: React.FC = () => {
                                                 </button>
                                              )}
                                              <div className="flex gap-2 ml-auto">
-                                                <button
-                                                    type="submit" 
-                                                    className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 flex items-center gap-2"
-                                                >
-                                                    <Reply size={16} /> Responder
-                                                </button>
+                                                {/* Use AdminSaveButton for reply action if Admin */}
+                                                {currentUser.role === UserRole.ADMIN ? (
+                                                     <AdminSaveButton 
+                                                        label="Responder y Guardar" 
+                                                        className="bg-red-600 hover:bg-red-700"
+                                                        onSave={() => { setExpandedId(null); setReplyText(''); }}
+                                                     />
+                                                ) : (
+                                                    <button
+                                                        type="submit" 
+                                                        className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 flex items-center gap-2"
+                                                    >
+                                                        <Reply size={16} /> Responder
+                                                    </button>
+                                                )}
                                              </div>
                                         </div>
                                     </form>

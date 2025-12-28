@@ -20,6 +20,7 @@ interface DataContextType {
   replyMessage: (messageId: string, response: string) => void;
   markAsRead: (messageId: string) => void;
   deleteMessage: (messageId: string) => void;
+  saveData: () => Promise<void>; // New manual save function
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -53,6 +54,21 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => { localStorage.setItem('ies_grades', JSON.stringify(grades)); }, [grades]);
   useEffect(() => { localStorage.setItem('ies_attendance', JSON.stringify(attendance)); }, [attendance]);
   useEffect(() => { localStorage.setItem('ies_messages', JSON.stringify(messages)); }, [messages]);
+
+  // Manual save function to be triggered by the Admin Button
+  const saveData = async () => {
+    // We force a rewrite to LocalStorage to simulate a "Commit" action
+    // In a real backend, this would be an API POST/PUT call
+    return new Promise<void>((resolve) => {
+        setTimeout(() => {
+            localStorage.setItem('ies_users', JSON.stringify(users));
+            localStorage.setItem('ies_grades', JSON.stringify(grades));
+            localStorage.setItem('ies_attendance', JSON.stringify(attendance));
+            localStorage.setItem('ies_messages', JSON.stringify(messages));
+            resolve();
+        }, 600); // Small artificial delay for UX "saving" feeling
+    });
+  };
 
   const addUser = (user: User) => {
     setUsers([...users, user]);
@@ -167,7 +183,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       users, subjects, grades, attendance, messages,
       addUser, updateUser, updateStudentId, deleteUser, 
       updateGrade, updateAttendance, getStudentData,
-      sendMessage, replyMessage, markAsRead, deleteMessage
+      sendMessage, replyMessage, markAsRead, deleteMessage, saveData
     }}>
       {children}
     </DataContext.Provider>

@@ -1,7 +1,9 @@
+
 import React, { useState } from 'react';
 import { useData } from '../../context/DataContext';
 import { UserRole } from '../../types';
 import { Search, CalendarDays, PieChart, Clock } from 'lucide-react';
+import { AdminSaveButton } from '../../components/AdminSaveButton';
 
 export const AcademicManager: React.FC = () => {
   const { users, subjects, grades, attendance, updateGrade, updateAttendance } = useData();
@@ -14,7 +16,12 @@ export const AcademicManager: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h2 className="text-2xl font-bold text-gray-800">Gestión Académica</h2>
+        <div>
+            <h2 className="text-2xl font-bold text-gray-800">Gestión Académica</h2>
+            <p className="text-sm text-gray-500">Edición de notas y control de asistencia</p>
+        </div>
+        {/* Global Save Button for this panel */}
+        <AdminSaveButton />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -45,9 +52,11 @@ export const AcademicManager: React.FC = () => {
               
               {/* Header with Tabs */}
               <div className="border-b border-gray-200">
-                  <div className="p-6 pb-4">
-                    <h3 className="text-xl font-bold text-gray-800">{selectedStudent.name}</h3>
-                    <p className="text-gray-500 text-sm">Modificando expediente académico</p>
+                  <div className="p-6 pb-4 flex justify-between items-start">
+                    <div>
+                        <h3 className="text-xl font-bold text-gray-800">{selectedStudent.name}</h3>
+                        <p className="text-gray-500 text-sm">Modificando expediente académico</p>
+                    </div>
                   </div>
                   
                   <div className="flex px-6 gap-6 overflow-x-auto">
