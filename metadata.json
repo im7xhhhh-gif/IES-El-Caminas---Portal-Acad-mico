@@ -1,5 +1,5 @@
 {
-  "name": "IES El Caminas - Portal Académico",
-  "description": "Plataforma de gestión académica para el ciclo DAM del IES El Caminas. Incluye portales para alumnos y administradores con gestión de notas y asistencia.",
+  "name": "IES El Caminas - Aules1",
+  "description": "Portal académico oficial desplegado en aules1. Gestión de expedientes, notas y comunicación para el ciclo DAM.",
   "requestFramePermissions": []
 }

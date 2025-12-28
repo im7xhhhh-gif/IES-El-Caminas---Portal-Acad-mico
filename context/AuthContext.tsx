@@ -17,12 +17,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const { users } = useData();
 
   const login = async (username: string, pass: string): Promise<boolean> => {
-    // Simulate network delay
+    // Simulate network delay for realism
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    const user = users.find(u => u.username === username && u.password === pass);
-    if (user) {
-      setCurrentUser(user);
+    // Find user with matching credentials
+    const userMatch = users.find(u => u.username === username && u.password === pass);
+    
+    if (userMatch) {
+      // SECURITY: Destructure to separate password from the rest of the user data
+      // We explicitly create a new object without the password field
+      // to ensure it is not stored in the global auth state.
+      const { password, ...safeUser } = userMatch;
+      
+      setCurrentUser(safeUser as User);
       return true;
     }
     return false;

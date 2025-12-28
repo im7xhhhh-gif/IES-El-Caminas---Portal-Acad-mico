@@ -1,10 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IES El Caminas | Conselleria d'Educació</title>
+    <meta name="description" content="Portal de Gestión Académica IES El Caminas - Aules1">
+    <meta name="theme-color" content="#7f1d1d">
+    <title>Aules1 | IES El Caminas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,6 +27,20 @@
         text-transform: uppercase;
         font-size: 0.75rem;
         letter-spacing: 0.05em;
+      }
+      /* Loading state for production */
+      #root:empty {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f1f5f9;
+      }
+      #root:empty::after {
+        content: "Cargando Portal Aules1...";
+        color: #7f1d1d;
+        font-weight: bold;
+        font-size: 1.2rem;
       }
     </style>
   <script type="importmap">
