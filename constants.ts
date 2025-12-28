@@ -50,19 +50,38 @@ export const INITIAL_USERS: User[] = [
   },
 ];
 
-// Initial dummy grades for demonstration updated for semesters
+// Updated grades: 
+// 1. No semester2 notes.
+// 2. English: Imad (10), Walid (9).
+// 3. Others: Random between 6.0 and 9.7.
 export const INITIAL_GRADES: Grade[] = [
-  { studentId: '2984619', subjectId: 'sub1', semester1: 8.5, semester2: 9.0 },
-  { studentId: '2984619', subjectId: 'sub2', semester1: 7.0, semester2: 6.5 },
-  { studentId: '2984619', subjectId: 'sub3', semester1: 9.2, semester2: 9.5 },
-  { studentId: '1209362', subjectId: 'sub1', semester1: 6.5, semester2: 5.0 },
-  { studentId: '1209362', subjectId: 'sub3', semester1: 8.0 }, // Only first semester graded
+  // --- IMAD (2984619) ---
+  { studentId: '2984619', subjectId: 'sub1', semester1: 8.7 }, // Sistemas
+  { studentId: '2984619', subjectId: 'sub2', semester1: 7.2 }, // Bases
+  { studentId: '2984619', subjectId: 'sub3', semester1: 9.4 }, // Programación
+  { studentId: '2984619', subjectId: 'sub4', semester1: 6.9 }, // Marcas
+  { studentId: '2984619', subjectId: 'sub5', semester1: 8.1 }, // Entornos
+  { studentId: '2984619', subjectId: 'sub6', semester1: 7.5 }, // IPE
+  { studentId: '2984619', subjectId: 'sub7', semester1: 10.0 }, // Inglés (Requested 10)
+
+  // --- WALID (1209362) ---
+  { studentId: '1209362', subjectId: 'sub1', semester1: 6.2 }, // Sistemas
+  { studentId: '1209362', subjectId: 'sub2', semester1: 7.9 }, // Bases
+  { studentId: '1209362', subjectId: 'sub3', semester1: 8.5 }, // Programación
+  { studentId: '1209362', subjectId: 'sub4', semester1: 9.6 }, // Marcas
+  { studentId: '1209362', subjectId: 'sub5', semester1: 6.8 }, // Entornos
+  { studentId: '1209362', subjectId: 'sub6', semester1: 7.3 }, // IPE
+  { studentId: '1209362', subjectId: 'sub7', semester1: 9.0 }, // Inglés (Requested 9)
 ];
 
-// Initial dummy attendance
+// Initial Attendance
+// Imad: 3 hours total.
+// Walid: 13 hours total.
 export const INITIAL_ATTENDANCE: Attendance[] = [
-  { studentId: '2984619', subjectId: 'sub1', absences: 2 },
-  { studentId: '1209362', subjectId: 'sub3', absences: 5 },
+  { studentId: '2984619', subjectId: 'sub1', absences: 3 }, // Imad Total: 3
+  
+  { studentId: '1209362', subjectId: 'sub2', absences: 8 }, // Walid Part 1
+  { studentId: '1209362', subjectId: 'sub5', absences: 5 }, // Walid Part 2 (Total 13)
 ];
 
 export const INITIAL_MESSAGES: Message[] = [
