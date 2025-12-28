@@ -29,8 +29,8 @@ export const INITIAL_USERS: User[] = [
   {
     id: '2984619',
     name: 'Imad El Ghoufairi Khouadri',
-    username: 'imad.elghoufairi',
-    password: 'imad123',
+    username: '2984619',
+    password: 'elgh2305',
     role: UserRole.STUDENT,
     academicYear: '2025-2026',
     level: '1º',
@@ -40,8 +40,8 @@ export const INITIAL_USERS: User[] = [
   {
     id: '1209362',
     name: 'Walid Taibi El Ghoufairi',
-    username: 'walid.taibi',
-    password: 'walid123',
+    username: '1209362',
+    password: 'elgh2810',
     role: UserRole.STUDENT,
     academicYear: '2025-2026',
     level: '1º',

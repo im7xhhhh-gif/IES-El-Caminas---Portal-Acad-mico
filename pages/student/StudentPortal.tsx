@@ -56,8 +56,27 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ view }) => {
     if (score === undefined || score === null) return <span className="text-gray-400 text-xs uppercase font-bold">Pendiente</span>;
     const passed = score >= 5;
     return (
-        <span className={`inline-block px-2 py-0.5 border text-xs font-bold uppercase tracking-wide ${passed ? 'bg-green-50 text-green-800 border-green-200' : 'bg-red-50 text-red-800 border-red-200'}`}>
+        <span className={`inline-block px-2 py-0.5 border text-xs font-bold uppercase tracking-wide rounded-sm ${passed ? 'bg-green-50 text-green-800 border-green-200' : 'bg-red-50 text-red-800 border-red-200'}`}>
             {passed ? 'APTO' : 'NO APTO'}
+        </span>
+    );
+  };
+
+  // Helper to render the grade with colors
+  const renderGradeBadge = (score?: number | null) => {
+    if (score === undefined || score === null) {
+        return <span className="text-gray-300 font-light">-</span>;
+    }
+
+    const isPass = score >= 5;
+    
+    return (
+        <span className={`inline-flex items-center justify-center w-14 py-1.5 rounded-md text-sm font-bold border transition-colors ${
+            isPass 
+            ? 'bg-green-50 text-green-700 border-green-200' 
+            : 'bg-red-50 text-red-700 border-red-200'
+        }`}>
+            {score.toFixed(1)}
         </span>
     );
   };
@@ -104,7 +123,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ view }) => {
         
         <div className="p-4 text-center">
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Nota Media ({view === 's1' ? '1º Sem' : view === 's2' ? '2º Sem' : 'Global'})</p>
-            <p className="text-3xl font-bold text-red-900">
+            <p className={`text-3xl font-bold ${parseFloat(calculateAverage(view === 'summary' ? 'final' : view)) >= 5 ? 'text-green-700' : 'text-red-700'}`}>
                 {view === 's1' ? calculateAverage('s1') : view === 's2' ? calculateAverage('s2') : calculateAverage('final')}
             </p>
         </div>
@@ -145,7 +164,6 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ view }) => {
               {subjects.map((subject, idx) => {
                 const { s1, s2 } = getSubjectGrades(subject.id);
                 const final = calculateFinalGrade(s1, s2);
-                const formatScore = (val?: number) => val !== undefined ? val.toFixed(1) : '';
 
                 // Determine which score to check for status badge
                 let statusScore: number | undefined | null;
@@ -165,30 +183,28 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ view }) => {
                     {/* Logic for S1 Panel */}
                     {view === 's1' && (
                         <td className="px-4 py-3 text-center border-r border-gray-200">
-                            <span className={`font-bold ${s1 !== undefined && s1 < 5 ? 'text-red-700' : 'text-gray-900'}`}>
-                                {formatScore(s1)}
-                            </span>
+                            {renderGradeBadge(s1)}
                         </td>
                     )}
 
                     {/* Logic for S2 Panel */}
                     {view === 's2' && (
                         <td className="px-4 py-3 text-center border-r border-gray-200">
-                            <span className={`font-bold ${s2 !== undefined && s2 < 5 ? 'text-red-700' : 'text-gray-900'}`}>
-                                {formatScore(s2)}
-                            </span>
+                            {renderGradeBadge(s2)}
                         </td>
                     )}
 
                     {/* Logic for Summary Panel */}
                     {view === 'summary' && (
                         <>
-                            <td className="px-4 py-3 text-center text-gray-500 border-r border-gray-200">{formatScore(s1)}</td>
-                            <td className="px-4 py-3 text-center text-gray-500 border-r border-gray-200">{formatScore(s2)}</td>
+                            <td className="px-4 py-3 text-center border-r border-gray-200">
+                                {renderGradeBadge(s1)}
+                            </td>
+                            <td className="px-4 py-3 text-center border-r border-gray-200">
+                                {renderGradeBadge(s2)}
+                            </td>
                             <td className="px-4 py-3 text-center bg-red-50/30 border-r border-gray-200">
-                                <span className={`font-bold ${final !== null && final !== undefined ? (final < 5 ? 'text-red-700' : 'text-red-900') : ''}`}>
-                                    {formatScore(final ?? undefined)}
-                                </span>
+                                {renderGradeBadge(final)}
                             </td>
                         </>
                     )}

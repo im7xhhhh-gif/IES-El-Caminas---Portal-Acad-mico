@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Shield, ArrowRight, AlertCircle, Info } from 'lucide-react';
+import { Shield, ArrowRight, AlertCircle } from 'lucide-react';
 import { InputField } from '../components/InputField';
 
 export const Login: React.FC = () => {
@@ -85,18 +85,6 @@ export const Login: React.FC = () => {
                 </button>
             </div>
           </form>
-
-          <div className="mt-8 pt-6 border-t border-gray-200 bg-red-50 -mx-8 -mb-8 p-6 text-sm text-red-900 flex gap-3">
-            <Info size={20} className="shrink-0 text-red-700" />
-            <div>
-              <p className="font-bold mb-1">Información de Acceso:</p>
-              <ul className="list-disc list-inside space-y-1 text-xs text-red-800">
-                <li><span className="font-semibold">Admin:</span> admin / admin123</li>
-                <li><span className="font-semibold">Docente:</span> ana.garcia / ana123</li>
-                <li><span className="font-semibold">Alumno:</span> imad.elghoufairi / imad123</li>
-              </ul>
-            </div>
-          </div>
         </div>
       </div>
       

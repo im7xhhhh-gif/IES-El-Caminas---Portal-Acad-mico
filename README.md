@@ -33,13 +33,13 @@ Acceso a mensajería con alumnos.
 Acceso a consulta de notas, perfil (sin foto) y contacto con profesores.
 
 **Alumno 1:**
-- **Usuario:** `imad.elghoufairi`
-- **Contraseña:** `imad123`
+- **Usuario:** `2984619`
+- **Contraseña:** `elgh2305`
 - **NIA:** `2984619`
 
 **Alumno 2:**
-- **Usuario:** `walid.taibi`
-- **Contraseña:** `walid123`
+- **Usuario:** `1209362`
+- **Contraseña:** `elgh2810`
 - **NIA:** `1209362`
 
 ---
