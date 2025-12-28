@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, UserRole } from '../types';
 import { useData } from './DataContext';
 
@@ -15,6 +16,25 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const { users } = useData();
+
+  // New Effect: Keep currentUser in sync with global data
+  // If Admin changes the student's name or group, the student should see it immediately
+  // without needing to relogin.
+  useEffect(() => {
+    if (currentUser) {
+      const updatedUser = users.find(u => u.id === currentUser.id);
+      if (updatedUser) {
+         // Create safe version (remove password)
+         const { password, ...safeUpdatedUser } = updatedUser;
+         
+         // Compare with current user state to avoid infinite loops
+         // We use JSON.stringify for a quick shallow deep comparison of properties
+         if (JSON.stringify(safeUpdatedUser) !== JSON.stringify(currentUser)) {
+             setCurrentUser(safeUpdatedUser as User);
+         }
+      }
+    }
+  }, [users, currentUser]);
 
   const login = async (username: string, pass: string): Promise<boolean> => {
     // Simulate network delay for realism

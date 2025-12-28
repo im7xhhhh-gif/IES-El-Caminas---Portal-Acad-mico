@@ -2,7 +2,7 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
-import { CheckCircle2, XCircle, TrendingUp, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, XCircle, TrendingUp, AlertTriangle, Clock } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface StudentPortalProps {
@@ -26,10 +26,12 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ view }) => {
     };
   };
 
+  // Strictly calculation for display in "Nota Final" column
+  // Returns null if incomplete
   const calculateFinalGrade = (s1?: number, s2?: number) => {
-    if (s1 === undefined && s2 === undefined) return null;
-    if (s1 === undefined) return s2;
-    if (s2 === undefined) return s1;
+    if (s1 === undefined || s2 === undefined || s1 === null || s2 === null || isNaN(s1) || isNaN(s2)) {
+        return null; 
+    }
     return parseFloat(((s1 + s2) / 2).toFixed(2));
   };
 
@@ -44,7 +46,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ view }) => {
       else if (semester === 's2') val = s2;
       else val = calculateFinalGrade(s1, s2);
 
-      if (val !== undefined && val !== null) {
+      if (val !== undefined && val !== null && !isNaN(val)) {
         sum += val;
         count++;
       }
@@ -52,20 +54,50 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ view }) => {
     return count > 0 ? (sum / count).toFixed(2) : '0.00';
   };
 
-  const StatusBadge = ({ score }: { score?: number | null }) => {
-    if (score === undefined || score === null) return <span className="text-gray-400 text-xs uppercase font-bold">Pendiente</span>;
-    const passed = score >= 5;
+  interface StatusBadgeProps {
+      s1?: number | null;
+      s2?: number | null;
+      view: 's1' | 's2' | 'summary';
+  }
+
+  const StatusBadge: React.FC<StatusBadgeProps> = ({ s1, s2, view }) => {
+    const isValid = (n?: number | null) => n !== undefined && n !== null && !isNaN(n);
+    
+    // Determine the relevant score based on view
+    let isPending = false;
+    let isPass = false;
+
+    if (view === 's1') {
+        if (!isValid(s1)) isPending = true;
+        else isPass = s1! >= 5;
+    } else if (view === 's2') {
+        if (!isValid(s2)) isPending = true;
+        else isPass = s2! >= 5;
+    } else {
+        // Summary: Pending if any semester is missing
+        if (!isValid(s1) || !isValid(s2)) isPending = true;
+        else isPass = ((s1! + s2!) / 2) >= 5;
+    }
+
+    if (isPending) {
+        return (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 border border-gray-200 bg-gray-50 text-gray-500 text-xs font-bold uppercase tracking-wide rounded-sm">
+                <Clock size={10} /> Pendiente
+            </span>
+        );
+    }
+
     return (
-        <span className={`inline-block px-2 py-0.5 border text-xs font-bold uppercase tracking-wide rounded-sm ${passed ? 'bg-green-50 text-green-800 border-green-200' : 'bg-red-50 text-red-800 border-red-200'}`}>
-            {passed ? 'APTO' : 'NO APTO'}
+        <span className={`inline-block px-2 py-0.5 border text-xs font-bold uppercase tracking-wide rounded-sm ${isPass ? 'bg-green-50 text-green-800 border-green-200' : 'bg-red-50 text-red-800 border-red-200'}`}>
+            {isPass ? 'APTO' : 'NO APTO'}
         </span>
     );
   };
 
   // Helper to render the grade with colors
   const renderGradeBadge = (score?: number | null) => {
-    if (score === undefined || score === null) {
-        return <span className="text-gray-300 font-light">-</span>;
+    if (score === undefined || score === null || isNaN(score)) {
+        return <span className="text-gray-300 font-light text-xl">-</span>;
     }
 
     const isPass = score >= 5;
@@ -93,6 +125,8 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ view }) => {
   // Evolution Data for Chart
   const chartData = subjects.map(sub => {
     const { s1, s2 } = getSubjectGrades(sub.id);
+    // For charts, we use 0 if undefined to show gaps, or we could filter. 
+    // Using 0 is standard for visual gap in area chart if connected, but let's just use what we have.
     return {
       name: sub.name.substring(0, 4) + '.',
       fullName: sub.name,
@@ -146,30 +180,24 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ view }) => {
                 <th className="px-4 py-3 font-bold uppercase w-1/3">Módulo Profesional</th>
                 <th className="px-4 py-3 font-bold uppercase">Docente</th>
                 
-                {view === 's1' && <th className="px-4 py-3 font-bold text-center border-l border-gray-300">Nota 1º Sem</th>}
-                {view === 's2' && <th className="px-4 py-3 font-bold text-center border-l border-gray-300">Nota 2º Sem</th>}
+                {view === 's1' && <th className="px-4 py-3 font-bold text-center border-l border-gray-300 w-32">Nota 1º Sem</th>}
+                {view === 's2' && <th className="px-4 py-3 font-bold text-center border-l border-gray-300 w-32">Nota 2º Sem</th>}
                 
                 {view === 'summary' && (
                     <>
-                        <th className="px-4 py-3 font-bold text-center border-l border-gray-300 bg-gray-50 text-gray-500">1º Sem</th>
-                        <th className="px-4 py-3 font-bold text-center border-l border-gray-300 bg-gray-50 text-gray-500">2º Sem</th>
-                        <th className="px-4 py-3 font-bold text-center border-l border-gray-300 bg-red-50 text-red-900">Nota Final</th>
+                        <th className="px-4 py-3 font-bold text-center border-l border-gray-300 bg-gray-50 text-gray-500 w-24">1º Sem</th>
+                        <th className="px-4 py-3 font-bold text-center border-l border-gray-300 bg-gray-50 text-gray-500 w-24">2º Sem</th>
+                        <th className="px-4 py-3 font-bold text-center border-l border-gray-300 bg-red-50 text-red-900 w-32">Nota Final</th>
                     </>
                 )}
 
-                <th className="px-4 py-3 font-bold text-center border-l border-gray-300">Calificación</th>
+                <th className="px-4 py-3 font-bold text-center border-l border-gray-300 w-32">Calificación</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {subjects.map((subject, idx) => {
                 const { s1, s2 } = getSubjectGrades(subject.id);
                 const final = calculateFinalGrade(s1, s2);
-
-                // Determine which score to check for status badge
-                let statusScore: number | undefined | null;
-                if (view === 's1') statusScore = s1;
-                else if (view === 's2') statusScore = s2;
-                else statusScore = final;
 
                 return (
                   <tr key={subject.id} className={`hover:bg-red-50 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
@@ -210,7 +238,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({ view }) => {
                     )}
 
                     <td className="px-4 py-3 text-center">
-                       <StatusBadge score={statusScore} />
+                       <StatusBadge s1={s1} s2={s2} view={view} />
                     </td>
                   </tr>
                 );

@@ -13,6 +13,12 @@ export const AcademicManager: React.FC = () => {
   const students = users.filter(u => u.role === UserRole.STUDENT);
   const selectedStudent = students.find(s => s.id === selectedStudentId);
 
+  // Helper to safely display values (avoids NaN in input)
+  const safeValue = (val: number | undefined) => {
+    if (val === undefined || isNaN(val)) return '';
+    return val;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -100,15 +106,15 @@ export const AcademicManager: React.FC = () => {
                   <tbody className="divide-y divide-gray-100">
                     {subjects.map(subject => {
                       const gradeEntry = grades.find(g => g.studentId === selectedStudent.id && g.subjectId === subject.id);
-                      const s1 = gradeEntry?.semester1 ?? '';
-                      const s2 = gradeEntry?.semester2 ?? '';
+                      const s1 = gradeEntry?.semester1;
+                      const s2 = gradeEntry?.semester2;
                       const currentAbsences = attendance.find(a => a.studentId === selectedStudent.id && a.subjectId === subject.id)?.absences ?? 0;
 
-                      // Calculate auto final
+                      // Calculate auto final safely
                       let final: string | number = '-';
-                      if (s1 !== '' && s2 !== '') final = ((Number(s1) + Number(s2)) / 2).toFixed(2);
-                      else if (s1 !== '') final = Number(s1).toFixed(2);
-                      else if (s2 !== '') final = Number(s2).toFixed(2);
+                      if (s1 !== undefined && s2 !== undefined) final = ((s1 + s2) / 2).toFixed(2);
+                      else if (s1 !== undefined) final = s1.toFixed(2) + ' (Prov.)';
+                      else if (s2 !== undefined) final = s2.toFixed(2) + ' (Prov.)';
 
                       return (
                         <tr key={subject.id} className="hover:bg-gray-50">
@@ -125,12 +131,18 @@ export const AcademicManager: React.FC = () => {
                                     min="0"
                                     max="10"
                                     step="0.1"
-                                    className={`w-24 text-center border rounded-md py-2 px-3 focus:ring-2 outline-none transition-colors font-bold text-lg ${Number(s1) < 5 && s1 !== '' ? 'border-red-300 bg-red-50 text-red-700' : 'border-red-200 focus:ring-red-200 text-red-800'}`}
-                                    value={s1}
+                                    className={`w-24 text-center border rounded-md py-2 px-3 focus:ring-2 outline-none transition-colors font-bold text-lg ${s1 !== undefined && s1 < 5 ? 'border-red-300 bg-red-50 text-red-700' : 'border-red-200 focus:ring-red-200 text-red-800'}`}
+                                    value={safeValue(s1)}
                                     placeholder="-"
                                     onChange={(e) => {
-                                        let val = parseFloat(e.target.value);
-                                        if (isNaN(val) && e.target.value !== '') return;
+                                        const valStr = e.target.value;
+                                        // If empty, pass undefined to clear
+                                        if (valStr === '') {
+                                            updateGrade(selectedStudent.id, subject.id, 1, undefined);
+                                            return;
+                                        }
+                                        let val = parseFloat(valStr);
+                                        if (isNaN(val)) return;
                                         if (val > 10) val = 10;
                                         if (val < 0) val = 0;
                                         updateGrade(selectedStudent.id, subject.id, 1, val);
@@ -145,12 +157,17 @@ export const AcademicManager: React.FC = () => {
                                     min="0"
                                     max="10"
                                     step="0.1"
-                                    className={`w-24 text-center border rounded-md py-2 px-3 focus:ring-2 outline-none transition-colors font-bold text-lg ${Number(s2) < 5 && s2 !== '' ? 'border-red-300 bg-red-50 text-red-700' : 'border-purple-200 focus:ring-purple-200 text-purple-800'}`}
-                                    value={s2}
+                                    className={`w-24 text-center border rounded-md py-2 px-3 focus:ring-2 outline-none transition-colors font-bold text-lg ${s2 !== undefined && s2 < 5 ? 'border-red-300 bg-red-50 text-red-700' : 'border-purple-200 focus:ring-purple-200 text-purple-800'}`}
+                                    value={safeValue(s2)}
                                     placeholder="-"
                                     onChange={(e) => {
-                                        let val = parseFloat(e.target.value);
-                                        if (isNaN(val) && e.target.value !== '') return;
+                                        const valStr = e.target.value;
+                                        if (valStr === '') {
+                                            updateGrade(selectedStudent.id, subject.id, 2, undefined);
+                                            return;
+                                        }
+                                        let val = parseFloat(valStr);
+                                        if (isNaN(val)) return;
                                         if (val > 10) val = 10;
                                         if (val < 0) val = 0;
                                         updateGrade(selectedStudent.id, subject.id, 2, val);
@@ -162,10 +179,10 @@ export const AcademicManager: React.FC = () => {
                             {activeTab === 'summary' && (
                                 <div className="flex items-center gap-4">
                                     <div className="text-sm text-gray-400 flex flex-col items-end">
-                                        <span>S1: <b>{s1 || '-'}</b></span>
-                                        <span>S2: <b>{s2 || '-'}</b></span>
+                                        <span>S1: <b>{safeValue(s1) || '-'}</b></span>
+                                        <span>S2: <b>{safeValue(s2) || '-'}</b></span>
                                     </div>
-                                    <div className={`w-24 py-2 px-3 text-center rounded-md font-bold text-lg ${Number(final) >= 5 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    <div className={`w-32 py-2 px-3 text-center rounded-md font-bold text-sm ${typeof final === 'string' && final.includes('Prov') ? 'bg-orange-50 text-orange-800 border border-orange-200' : parseFloat(final as string) >= 5 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                         {final}
                                     </div>
                                 </div>

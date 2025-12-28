@@ -13,7 +13,7 @@ interface DataContextType {
   updateUser: (user: User) => void;
   updateStudentId: (oldId: string, newId: string) => void;
   deleteUser: (id: string) => void;
-  updateGrade: (studentId: string, subjectId: string, semester: 1 | 2, score: number) => void;
+  updateGrade: (studentId: string, subjectId: string, semester: 1 | 2, score: number | undefined) => void;
   updateAttendance: (studentId: string, subjectId: string, absences: number) => void;
   getStudentData: (studentId: string) => { grades: Grade[], attendance: Attendance[] };
   sendMessage: (msg: Omit<Message, 'id' | 'status' | 'sentAt'>) => void;
@@ -49,11 +49,32 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return stored ? JSON.parse(stored) : INITIAL_MESSAGES;
   });
 
-  // Persist to local storage
+  // Persist to local storage whenever state changes
   useEffect(() => { localStorage.setItem('ies_users', JSON.stringify(users)); }, [users]);
   useEffect(() => { localStorage.setItem('ies_grades', JSON.stringify(grades)); }, [grades]);
   useEffect(() => { localStorage.setItem('ies_attendance', JSON.stringify(attendance)); }, [attendance]);
   useEffect(() => { localStorage.setItem('ies_messages', JSON.stringify(messages)); }, [messages]);
+
+  // LISTEN FOR EXTERNAL CHANGES (Cross-Tab Synchronization)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'ies_users' && e.newValue) {
+         setUsers(JSON.parse(e.newValue));
+      }
+      if (e.key === 'ies_grades' && e.newValue) {
+         setGrades(JSON.parse(e.newValue));
+      }
+      if (e.key === 'ies_attendance' && e.newValue) {
+         setAttendance(JSON.parse(e.newValue));
+      }
+      if (e.key === 'ies_messages' && e.newValue) {
+         setMessages(JSON.parse(e.newValue));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Manual save function to be triggered by the Admin Button
   const saveData = async () => {
@@ -103,7 +124,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setMessages(messages.filter(m => m.studentId !== id));
   };
 
-  const updateGrade = (studentId: string, subjectId: string, semester: 1 | 2, score: number) => {
+  const updateGrade = (studentId: string, subjectId: string, semester: 1 | 2, score: number | undefined) => {
     setGrades(prev => {
       const existing = prev.find(g => g.studentId === studentId && g.subjectId === subjectId);
       if (existing) {
@@ -114,6 +135,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             return g;
         });
       }
+      
+      // If we are trying to clear a grade that doesn't exist, do nothing
+      if (score === undefined) return prev;
+
       // Create new grade entry
       const newGrade: Grade = { studentId, subjectId };
       if (semester === 1) newGrade.semester1 = score;
