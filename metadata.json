@@ -1,5 +1,5 @@
 {
-  "name": "IES El Caminas - Aules1",
-  "description": "Portal académico oficial desplegado en aules1. Gestión de expedientes, notas y comunicación para el ciclo DAM.",
+  "name": "IES El Caminas - Aules",
+  "description": "Portal académico oficial desplegado en aules. Gestión de expedientes, notas y comunicación para el ciclo DAM.",
   "requestFramePermissions": []
 }

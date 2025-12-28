@@ -1,6 +1,6 @@
-# IES El Caminas - Portal Académico (Aules1)
+# IES El Caminas - Portal Académico (Aules)
 
-Este proyecto es una aplicación web progresiva (SPA) desarrollada con React para la gestión académica del ciclo de Desarrollo de Aplicaciones Multiplataforma. Está configurada para ser desplegada en el entorno de producción `aules1`.
+Este proyecto es una aplicación web progresiva (SPA) desarrollada con React para la gestión académica del ciclo de Desarrollo de Aplicaciones Multiplataforma. Está configurada para ser desplegada en el entorno de producción `aules`.
 
 ## 🚀 Despliegue en Producción
 
@@ -10,8 +10,8 @@ Este proyecto es una aplicación web progresiva (SPA) desarrollada con React par
 
 ### Instrucciones de Instalación
 1. **Compilación**: Si se utiliza un bundler, ejecutar `npm run build`.
-2. **Subida**: Subir el contenido de la carpeta resultante al directorio `/aules1` de su servidor web.
-3. **Rutas**: La aplicación utiliza `HashRouter` (ej. `dominio.com/aules1/#/login`). Esto garantiza compatibilidad total con subcarpetas sin necesidad de configurar reescritura de URLs (mod_rewrite) en el servidor.
+2. **Subida**: Subir el contenido de la carpeta resultante al directorio `/aules` de su servidor web.
+3. **Rutas**: La aplicación utiliza `HashRouter` (ej. `dominio.com/aules/#/login`). Esto garantiza compatibilidad total con subcarpetas sin necesidad de configurar reescritura de URLs (mod_rewrite) en el servidor.
 
 ---
 
